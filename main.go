@@ -599,18 +599,33 @@ func processBenchOutput(
 func logProfileLocations(
 	bs1, bs2 *benchSuite, cpuProfile, memProfile, mutexProfile bool,
 ) {
-	log := func(label, filename string) {
+	if !cpuProfile && !memProfile && !mutexProfile {
+		return
+	}
+	entries, err := os.ReadDir(bs1.profileMergedDir())
+	if err != nil {
+		return
+	}
+	var names []string
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		names = append(names, entry.Name())
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		label := name
+		switch name {
+		case cpuProfileName:
+			label = "cpu"
+		case memProfileName:
+			label = "mem"
+		case mutexProfileName:
+			label = "mutex"
+		}
 		fmt.Printf("\nwrote merged %s profile to:\n  old=%s\n  new=%s\n",
-			label, bs1.profileMergedPath(filename), bs2.profileMergedPath(filename))
-	}
-	if cpuProfile {
-		log("cpu", cpuProfileName)
-	}
-	if memProfile {
-		log("mem", memProfileName)
-	}
-	if mutexProfile {
-		log("mutex", mutexProfileName)
+			label, bs1.profileMergedPath(name), bs2.profileMergedPath(name))
 	}
 }
 
