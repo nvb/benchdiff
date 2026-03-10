@@ -1,6 +1,6 @@
 module github.com/nvanbenschoten/benchdiff
 
-go 1.23
+go 1.23.0
 
 toolchain go1.24.3
 
@@ -25,7 +25,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/oauth2 v0.25.0 // indirect
+	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
