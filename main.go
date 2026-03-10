@@ -317,7 +317,9 @@ func parseGitRefs(oldRef, newRef string) (string, string, error) {
 	return oldRef, newRef, nil
 }
 
-func buildBenches(ctx context.Context, pkgFilter []string, postChck string, bss ...*benchSuite) error {
+func buildBenches(
+	ctx context.Context, pkgFilter []string, postChck string, bss ...*benchSuite,
+) error {
 	// Get the current branch so we can revert to it after, if possible.
 	if ref, ok, err := getCurSymbolicRef(); err != nil {
 		return err
@@ -596,9 +598,7 @@ func processBenchOutput(
 	return tables, nil
 }
 
-func logProfileLocations(
-	bs1, bs2 *benchSuite, cpuProfile, memProfile, mutexProfile bool,
-) {
+func logProfileLocations(bs1, bs2 *benchSuite, cpuProfile, memProfile, mutexProfile bool) {
 	if !cpuProfile && !memProfile && !mutexProfile {
 		return
 	}
@@ -712,7 +712,14 @@ func (bs *benchSuite) build(pkgFilter []string, postChck string, t time.Time) (e
 			}
 			bs.testFiles[f.Name()] = struct{}{}
 		}
-		return nil
+		if len(bs.testFiles) > 0 {
+			return nil
+		}
+		// The bin directory exists but contains no test binaries. This can
+		// happen if a previous build was interrupted. Remove it and rebuild.
+		if err := os.RemoveAll(bs.binDir); err != nil {
+			return err
+		}
 	} else if !os.IsNotExist(err) {
 		return errors.Wrap(err, "looking for test directory")
 	}
